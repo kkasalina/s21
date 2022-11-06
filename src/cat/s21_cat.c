@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
         {
             switch (ge)
             {
-                case 'b': n = 0, b++; break;
+                case 'b': b++; break;
                 case 'v': v++; break;
                 case 'E':
                 case 'e': e++; break;
@@ -90,6 +90,7 @@ int main(int argc, char *argv[])
                         c = '^';
                     }
                 }
+                if (b != 0) n = 0;
                 if (n != 0 && b == 0)
                 {
                     if (symCount == 0)
@@ -138,9 +139,9 @@ int main(int argc, char *argv[])
 
 
                     if (e != 0 && c == '\n') printf("$");
-                    if (n != 0 && b == 0 && flag_v == 0) printf("%c", c);
-                    if (n != 0  &&  endStr != 0) printf("%6d\t", n++);
-                    if (b != 0 && n == 0 && lastSim == '\n' && c != '\n') printf("%6d\t", b++);
+                    if (n != 0 && flag_v == 0) printf("%c", c);
+                    if (n != 0 && endStr != 0) printf("%6d\t", n++);
+                    if (b != 0 && lastSim == '\n' && c != '\n') printf("%6d\t", b++);
                     if (v != 0 && flag_v != 0) printf("^");
                       
                     
