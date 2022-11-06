@@ -24,11 +24,11 @@ int main(int argc, char *argv[])
                 case 'b': n = 0, b++; break;
                 case 'v': v++; break;
                 case 'E':
-                case 'e': v++, e++; break;
+                case 'e': e++; break;
                 case 'n': n++; break;
                 case 's': s++; break;
                 case 'T':
-                case 't': v++, t++; break;
+                case 't': t++; break;
                 case '?': 
                 default: printf("Флаг не распознан!\n"); exit(1);
             }
@@ -73,18 +73,17 @@ int main(int argc, char *argv[])
                         continue;
                     }
                 }
-                if (e)
-                {
-                    if (c == '\n')
-                    {
-                       //printf("$");
-                    } 
-                }
+                // if (e)
+                // {
+                //     if (c == '\n')
+                //     {
+                //        printf("$");
+                //     } 
+                // }
                 
                 
                 if (t != 0)
                 {
-                    // int flag = 0;
                     if (c == '\t')
                     {   
                         flag_t = c;
@@ -103,38 +102,59 @@ int main(int argc, char *argv[])
                         c == n;
                     }
                 }
-                if (v)
+                if (v == 1)
                 {
                     if (c < 32 && c != 9 && c != 10)
                     {
-                        c += 64;
+                       
+                        //printf("^");  
+                         c += 64;   
                         flag_v++;
-                        printf("^");  
+                     
                         
-                    } else if (c == 127)
+                    }
+                     if (c == 127)
                     {
-                        c = '?';
+                        // printf("^");
+                         c = '?';
                         flag_v++;
                         
                     }
-                }   if (e != 0 && c == '\n') printf("$");
-                    if (n != 0) printf("%c", c);
-                    if (n != 0 && b == 0 &&  endStr != 0) printf("%6d\t", n++);
-                    if (b != 0 && lastSim == '\n' && c != '\n') printf("%6d\t", b++);
+                    
+                }   
+                    // if (e != 0 && c == '\n') printf("$");
+                    // if (n != 0 && flag_v != 0 && v != 0) printf("%c", c);
+                    // if (n != 0 && b == 0 &&  endStr != 0 ) printf("%6d\t", n++);
+                    // if (b != 0 && lastSim == '\n' && c != '\n') printf("%6d\t", b++);
+                    // if (v != 0 && flag_v != 0) 
+                    // {
+                    //     printf("^");
+                    //    if (t == 0 ) 
+                    //     printf("%c", c);
+                    // }
+                    // if (n == 0 && ( flag_v == 0)) printf("%c", c);
+                    
+                    // if (t != 0 && c == '^' && flag_t == '\t') printf("I");
+
+
+                    if (e != 0 && c == '\n') printf("$");
+                    if (n != 0 && b == 0 && flag_v == 0) printf("%c", c);
+                    if (n != 0  &&  endStr != 0) printf("%6d\t", n++);
+                    if (b != 0 && n == 0 && lastSim == '\n' && c != '\n') printf("%6d\t", b++);
                     if (v != 0 && flag_v != 0) printf("^");
                       
                     
-                    if (n == 0) printf("%c", c);
+                    if (n == 0 || flag_v != 0) printf("%c", c);
                     
                     if (t != 0 && c == '^' && flag_t == '\t') printf("I");
+                   
+
                 
                 lastLastSim = lastSim;
                 lastSim = c;
                 endStr = 0;
                 flag_t = '0';
                 flag_v = 0;
-                //if (symCount == size) break;
-                //printf("%d", symCount)
             }
             
         filename++;
