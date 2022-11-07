@@ -84,6 +84,7 @@ int main(int argc, char *argv[])
                 
                 if (t != 0)
                 {
+                    v = 1;
                     if (c == '\t')
                     {   
                         flag_t = c;
@@ -97,50 +98,35 @@ int main(int argc, char *argv[])
                     {
                         printf("%6d\t", n);
                         n++;
-                    }
-                    if (c == '\n') 
-                    {
-                        c == n;
-                    }
+                    } 
+                    //
+                    // if (c == '\n') 
+                    // { break;
+                    //     // c = (int) n;
+                        
+                    // }
                 }
                 if (v == 1)
                 {
                     if (c < 32 && c != 9 && c != 10)
                     {
-                       
-                        //printf("^");  
                          c += 64;   
                         flag_v++;
-                     
-                        
                     }
                      if (c == 127)
                     {
-                        // printf("^");
                          c = '?';
                         flag_v++;
                         
                     }
-                    
                 }   
-                    // if (e != 0 && c == '\n') printf("$");
-                    // if (n != 0 && flag_v != 0 && v != 0) printf("%c", c);
-                    // if (n != 0 && b == 0 &&  endStr != 0 ) printf("%6d\t", n++);
-                    // if (b != 0 && lastSim == '\n' && c != '\n') printf("%6d\t", b++);
-                    // if (v != 0 && flag_v != 0) 
-                    // {
-                    //     printf("^");
-                    //    if (t == 0 ) 
-                    //     printf("%c", c);
-                    // }
-                    // if (n == 0 && ( flag_v == 0)) printf("%c", c);
-                    
-                    // if (t != 0 && c == '^' && flag_t == '\t') printf("I");
-
-
-                    if (e != 0 && c == '\n') printf("$");
+                    if (e != 0 && c == '\n')
+                    {
+                        v = 1;
+                        printf("$");
+                    } 
                     if (n != 0 && flag_v == 0) printf("%c", c);
-                    if (n != 0 && endStr != 0) printf("%6d\t", n++);
+                   if (n != 0  && endStr != 0)  printf("%6d\t", n++);
                     if (b != 0 && lastSim == '\n' && c != '\n') printf("%6d\t", b++);
                     if (v != 0 && flag_v != 0) printf("^");
                       
