@@ -35,7 +35,8 @@ int main(int argc, char *argv[])
         }
         FILE *file;
         int filename = optind;
-
+            
+            
         while (filename < argc)
         {
             file = fopen(argv[filename], "r");
@@ -44,19 +45,23 @@ int main(int argc, char *argv[])
                 perror("Файл не найден");
                 exit(1);
             }
-            
-            // int size = 0;
-            // char f;
-            // while ((f = getc(file)) != EOF)
-            // {
-            //     size++;
-            // }
 
+            char f;
+            int size = 0;
+            while ((f = getc(file)) != EOF)
+            {
+                size++;
+            
+            } 
+            fclose(file);
+            file = fopen(argv[filename], "r");
+           
             char lastSim = '\n';
             char lastLastSim = '0';
             char c = '0';
             char flag_t = '0';
             int flag_v = 0;
+            
 
             for (int symCount = 0; (c = getc(file)) != EOF; symCount++)
             {   
@@ -67,21 +72,13 @@ int main(int argc, char *argv[])
                     if (symCount == 1 && lastSim == '\n' && c == '\n') 
                     {
                         continue;
+                        
                     }
                     if (lastLastSim == '\n' && lastSim == '\n' && c == '\n')
                     {
                         continue;
                     }
                 }
-                // if (e)
-                // {
-                //     if (c == '\n')
-                //     {
-                //        printf("$");
-                //     } 
-                // }
-                
-                
                 if (t != 0)
                 {
                     v = 1;
@@ -98,13 +95,7 @@ int main(int argc, char *argv[])
                     {
                         printf("%6d\t", n);
                         n++;
-                    } 
-                    //
-                    // if (c == '\n') 
-                    // { break;
-                    //     // c = (int) n;
-                        
-                    // }
+                    }
                 }
                 if (v == 1)
                 {
@@ -120,28 +111,27 @@ int main(int argc, char *argv[])
                         
                     }
                 }   
-                    if (e != 0 && c == '\n')
-                    {
-                        v = 1;
-                        printf("$");
-                    } 
-                    if (n != 0 && flag_v == 0) printf("%c", c);
-                   if (n != 0  && endStr != 0)  printf("%6d\t", n++);
+                if (e != 0 && c == '\n')
+                {
+                    v = 1;
+                    printf("$");
+                }  
+                   
+                    if (n != 0 && flag_v == 0 ) printf("%c", c);
+                    if (n != 0 && endStr != 0 && (symCount != size - 1 && c == '\n'))  printf("%6d\t", n++);
                     if (b != 0 && lastSim == '\n' && c != '\n') printf("%6d\t", b++);
                     if (v != 0 && flag_v != 0) printf("^");
-                      
-                    
-                    if (n == 0 || flag_v != 0) printf("%c", c);
-                    
-                    if (t != 0 && c == '^' && flag_t == '\t') printf("I");
-                   
 
+                    if (n == 0 || flag_v != 0) printf("%c", c); 
+
+                    if (t != 0 && c == '^' && flag_t == '\t') printf("I");
                 
                 lastLastSim = lastSim;
                 lastSim = c;
                 endStr = 0;
                 flag_t = '0';
                 flag_v = 0;
+                if (symCount == size - 1) n = 1;
             }
             
         filename++;
