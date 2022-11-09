@@ -24,5 +24,4 @@ void shablon_str(char** argv);
 void reg_func ();
 
 
-
 #endif // SRC_CAT_S21_GREP_H_

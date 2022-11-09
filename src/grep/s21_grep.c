@@ -67,6 +67,7 @@ void shablon_str(char** argv) {
       snprintf(str, SIZE, " %s", argv[optind]);  // нужно optarg and | ?
       strcat(shablon, str);
     }
+ 
   }
   if (f && !e) {
     char f_pattern[SIZE] = {0};
@@ -144,3 +145,4 @@ void reg_func(int argc, FILE* file, char** str) {
 
     regexec
 }
+   
