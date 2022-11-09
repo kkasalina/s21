@@ -1,24 +1,30 @@
 #include "s21_grep.h"
 
 int main(int argc, char* argv[]) {
-  if (argc != 1) {
-    while ((gr = getopt_long(argc, argv, "+e:f:ivclnhso?", long_options, NULL) !=
+  //if (argc != 1) {
+   
+    while (((gr = getopt_long(argc, argv, short_options, long_options, NULL)) !=
                  -1)) {
+                   //  printf("000");
       flags(gr, argv);
-    }
+      //printf("111");
+    }    
+    //printf("999");
     shablon_str(argv);
     input_file_open(argc, argv, optind);
     // reg_func();
-  }
+ // }
   return 0;
 }
 
 
 // чтение флагов
 void flags(int gr, char** argv) {
+   // printf("222");
   switch (gr) {
     case 'e':
       e++;
+      //printf("%d", e);
       shablon_str(argv);
       break;
     case 'i':
@@ -51,16 +57,18 @@ void flags(int gr, char** argv) {
       break;
     case '?':
     default:
-      printf("Флаг не распознан!\n");
+       printf("Флаг не распознан!\n");
       exit(1);
   }
 }
 // чтение шаблона из потока ввода
 void shablon_str(char** argv) {
+   // printf("333");
   char str[SIZE];
   // char buf[SIZE];
   if (e == 0 && f == 0) {
     snprintf(shablon, SIZE, "%s", argv[optind++]);  // можно optarg?
+   // printf("444");
   }
   if (e != 0 && f == 0) {
     if (optarg == 0 || !shablon[0])
@@ -101,34 +109,37 @@ void shablon_str(char** argv) {
 }
 // открытие и проверка файла, доработать
 void input_file_open(int argc, char** argv, int optind) {
+   // printf("555");
   FILE* file;
   int filename = optind;
   char* str;
-
-  for (str = argv[filename]; str != NULL; filename++) {
-    if (str) {
-      file = fopen(argv[filename], "r");
-      if (file == NULL) {
-        if (s == 0) {
-          perror("Файл не найден");
-          exit(1);
+    while ((str =argv[filename]) != NULL) {
+        if (str) {
+            file = fopen(argv[filename], "r");
+            if (file == NULL) {
+                if (s == 0) {
+                //  printf("666");
+                perror("Файл не найден");
+                exit(1);
+                }
+            }
+            //printf("777");
+            reg_func(argc, file, str);
         }
-      }
-      void reg_func();
+        filename++;
+        fclose(file);
     }
-    fclose(file);
-  }
 }
 // функция взаимодействия флагов и печать
-void reg_func(int argc, FILE* file, char** str) {
-
+void reg_func(int argc, FILE* file, char* str) {
+//printf("888");
   int a;
   regex_t rege; // хранениe скомпилированного регулярного выражения
   size_t match_n = 4; // длина массива структуры regmatch_t
   regmatch_t match_p[4];
   int leght = 1000;
   int out;
-  int gone = 0;
+  int done = 0;
 
 /*____________________________________________________________________
  regmatch_t - это тип данных структуры, который определен
@@ -143,29 +154,31 @@ void reg_func(int argc, FILE* file, char** str) {
  конечную позицию
 ____________________________________________________________________*/
 
-
   char * pattern = (char*) malloc(leght + 1); // динамическое выделение памяти под символьную строку
   if (pattern == NULL) exit (1);
+  //printf("111222333");
+  
+  if (e && !i) {
+    a = regcomp(&rege, shablon, REG_EXTENDED); 
+    }  
     while ((out = getc(file) != EOF))
     {
-        if (regexec(&rege, pattern, match_n, match_p, 0) == 0) gone++;
-    }
-
+        if (regexec(&rege, pattern, match_n, match_p, 0) == 0) done++;
+       
+    } printf("%d", done);
+    // if (tmp_line[strlen(tmp_line) - 1] == 10) {
+    //   tmp_line[strlen(tmp_line) - 1] = 0;
+    // } - зачем это?
 
 
 // перенести сообщение об ошибке из-за e или i
-// if (e && !i) {
-//     a = regcomp(&rege, shablon, REG_EXTENDED) 
-// }    
+  
 
 //output_flags(file, pattern, rege, match_n, match_p);
     //regexec
     free(pattern);
     regfree(&rege);
 }
-
-
-
 // void output_flags (FILE* file, char *pattern, regex_t rege, size_t match_n,
 //                     regmatch_t match_p[4])
 // {
