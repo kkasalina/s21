@@ -12,6 +12,8 @@ int main(int argc, char* argv[]) {
   }
   return 0;
 }
+
+
 // чтение флагов
 void flags(int gr, char** argv) {
   switch (gr) {
@@ -119,30 +121,56 @@ void input_file_open(int argc, char** argv, int optind) {
 }
 // функция взаимодействия флагов и печать
 void reg_func(int argc, FILE* file, char** str) {
-  char * pattern;
+
+  int a;
   regex_t rege; // хранениe скомпилированного регулярного выражения
   size_t match_n = 4; // длина массива структуры regmatch_t
   regmatch_t match_p[4];
+  int leght = 1000;
+  int out;
+  int gone = 0;
 
-//____________________________________________________________________
-// regmatch_t - это тип данных структуры, который определен
-// в regex.h ::
-// typedef struct
-// {
-//    regoff_t rm_so;
-//    regoff_t rm_eo;
-// } regmatch_t;
-// Элемент rm_so сохраняет начальную позицию соответствующей 
-// текстовой строки в целевой строке, а rm_eo сохраняет 
-// конечную позицию
-//____________________________________________________________________
+/*____________________________________________________________________
+ regmatch_t - это тип данных структуры, который определен
+ в regex.h ::
+ typedef struct
+ {
+    regoff_t rm_so;
+    regoff_t rm_eo;
+ } regmatch_t;
+ Элемент rm_so сохраняет начальную позицию соответствующей 
+ текстовой строки в целевой строке, а rm_eo сохраняет 
+ конечную позицию
+____________________________________________________________________*/
+
+
+  char * pattern = (char*) malloc(leght + 1); // динамическое выделение памяти под символьную строку
+  if (pattern == NULL) exit (1);
+    while ((out = getc(file) != EOF))
+    {
+        if (regexec(&rege, pattern, match_n, match_p, 0) == 0) gone++;
+    }
 
 
 
+// перенести сообщение об ошибке из-за e или i
+// if (e && !i) {
+//     a = regcomp(&rege, shablon, REG_EXTENDED) 
+// }    
 
-
-  regcomp
-
-    regexec
+//output_flags(file, pattern, rege, match_n, match_p);
+    //regexec
+    free(pattern);
+    regfree(&rege);
 }
-   
+
+
+
+// void output_flags (FILE* file, char *pattern, regex_t rege, size_t match_n,
+//                     regmatch_t match_p[4])
+// {
+//     int out;
+//     while ((out = getc(file)) != EOF)
+//     {
+//     }
+// }
