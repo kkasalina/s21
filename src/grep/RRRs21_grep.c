@@ -153,7 +153,7 @@ void get_varriable(FILE *file_name, int argc, char *path) {
       }
       if (nflag) {
         printf("%d:", count_line + 1);
-      }
+    }
       printf("%s\n", tmp_line);
     }
     if (vflag && !cflag && !lflag && success != 0) {

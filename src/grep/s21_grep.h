@@ -13,7 +13,7 @@
 
 const char *short_options = "+e:ivclnhsf:o";
 int gr, e = 0, i = 0, v = 0, c = 0, l = 0, n = 0, h = 0, s = 0, f = 0, o = 0;
-char shablon[10000];
+char shablon[SIZE];
 static struct option long_options[] =
     {
       {0, 0, 0, 0},

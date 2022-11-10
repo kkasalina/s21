@@ -67,19 +67,20 @@ void shablon_str(char** argv) {
   char str[SIZE];
   // char buf[SIZE];
   if (e == 0 && f == 0) {
-    snprintf(shablon, SIZE, "%s", argv[optind++]);  // можно optarg?
+    snprintf(shablon, SIZE, "%s", argv[optind]);  // можно optarg?
    // printf("444");
+   optind++;
   }
   if (e != 0 && f == 0) {
-    if (optarg == 0 || !shablon[0])
-      snprintf(shablon, SIZE, "%s", argv[optind]);  // нужно optarg
+    if (shablon[0] == 0)
+      snprintf(shablon, SIZE, "%s", optarg);  // нужно optarg
     else {
-      snprintf(str, SIZE, " %s", argv[optind]);  // нужно optarg and | ?
+      snprintf(str, SIZE, " %s", optarg);  // нужно optarg and | ?
       strcat(shablon, str);
     }
  
   }
-  if (f && !e) {
+  if (f) {
     char f_pattern[SIZE] = {0};
     FILE* f_file;
     char* f_str = optarg;
@@ -135,10 +136,9 @@ void reg_func(int argc, FILE* file, char* str) {
 //printf("888");
   int a;
   regex_t rege; // хранениe скомпилированного регулярного выражения
-  size_t match_n = 4; // длина массива структуры regmatch_t
-  regmatch_t match_p[4];
-  int leght = 1000;
-  int out;
+  size_t match_n = 4, leght = 1000; // длина массива структуры regmatch_t
+  regmatch_t match_p[4]; 
+  int out, mom;
   int done = 0;
 
 /*____________________________________________________________________
@@ -154,18 +154,23 @@ void reg_func(int argc, FILE* file, char* str) {
  конечную позицию
 ____________________________________________________________________*/
 
-  char * pattern = (char*) malloc(leght + 1); // динамическое выделение памяти под символьную строку
+  char* pattern = NULL;
+  pattern = (char*) malloc(leght + 1); // динамическое выделение памяти под символьную строку
   if (pattern == NULL) exit (1);
   //printf("111222333");
   
-  if (e && !i) {
-    a = regcomp(&rege, shablon, REG_EXTENDED); 
-    }  
-    while ((out = getc(file) != EOF))
+  // if (e && !i) {
+  //   if (a = regcomp(&rege, shablon, REG_EXTENDED) == 0)  
+  //     printf("%s", rege);
+  //   }  
+
+    while ((out = getline(&pattern, &leght, file) != EOF)) 
     {
-        if (regexec(&rege, pattern, match_n, match_p, 0) == 0) done++;
-       
-    } printf("%d", done);
+        if (mom = regexec(&rege, pattern, match_n, match_p, 0) != 0) { 
+          done++;
+        }
+
+    } 
     // if (tmp_line[strlen(tmp_line) - 1] == 10) {
     //   tmp_line[strlen(tmp_line) - 1] = 0;
     // } - зачем это?
