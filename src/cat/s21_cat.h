@@ -20,7 +20,7 @@ static struct option long_options[] = {{"number-nonblank", 0, 0, 'b'},
 
 };
 
-void flags(char **argv);
+void flags();
 void file_open(int argc, char **argv, int optind);
 void big(FILE *file);
 

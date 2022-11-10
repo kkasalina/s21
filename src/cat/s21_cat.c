@@ -6,7 +6,7 @@ int main(int argc, char *argv[]) {
   if (argc != 1) {
     while (((ge = getopt_long(argc, argv, "+beEnstTv?", long_options, NULL)) !=
             -1)) {
-      flags(argv);
+      flags();
     }
     file_open(argc, argv, optind);
   }
@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
   return 0;
 }
 
-void flags(char **argv) {
+void flags() {
   switch (ge) {
     case 'b':
       b++;
@@ -52,9 +52,6 @@ void file_open(int argc, char **argv, int optind) {
       perror("Файл не найден");
       exit(1);
     }
-    char f;
-    int size = 0;
-
     file = fopen(argv[filename], "r");
     big(file);
     filename++;
