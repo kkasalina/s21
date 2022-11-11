@@ -158,7 +158,7 @@ void get_varriable(FILE *file_name, int argc, char *path) {
     }
     if (vflag && !cflag && !lflag && success != 0) {
       if ((argc - optind) > 1 && !hflag) {
-        printf("%s:", path);
+       printf("%s:", path);
       }
       if (nflag) {
         printf("%d:", count_line + 1);
@@ -217,7 +217,7 @@ void get_varriable(FILE *file_name, int argc, char *path) {
     } else {
       printf("%d\n", 0);
     }
-  }
+   }
   if (vflag && cflag && lflag) {
     if ((argc - optind) > 1 && !hflag) {
       printf("%s:", path);
