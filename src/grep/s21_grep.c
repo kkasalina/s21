@@ -81,30 +81,29 @@ void shablon_str(char** argv) {
   if (f) {
     char f_pattern[SIZE] = {0};
     FILE* f_file;
-    char* f_str = optarg;
-    if (f_file != NULL) {
-      if (f_file) {
-        f_file = fopen(f_str, "r");
+    char* f_str;
+    f_str = optarg;
+    if (f_str != NULL) {
+      if ((f_file = fopen(f_str, "r"))) {
         while ((fgets(f_pattern, SIZE, f_file)) != NULL)
         {
           if (f_pattern[strlen(f_pattern) - 1] == 10) {
             f_pattern[strlen(f_pattern) - 1] = 0;
           }
-          if (optarg == 0 || !shablon[0])
-            snprintf(shablon, sizeof(shablon), "%s", optarg);  
+          if (shablon[0] == 0)
+            snprintf(shablon, sizeof(shablon), "%s", f_pattern);  
           else {
             snprintf(str, sizeof(shablon), "|%s",
-                     optarg);
+                     f_pattern);
             strcat(shablon, str);
           }
-          // счетчик i++ ?
         }
       } else {
         if (s == 0) {
           perror("Файл не найден");
           exit(1);
         }
-        fclose(f_file);  // нужно ли закрывать?
+      fclose(f_file);  // нужно ли закрывать?
       }
     }
   }
@@ -173,6 +172,8 @@ void reg_func(FILE* file, char* str_f, int argc) {  //,
       leght + 1);  // динамическое выделение памяти под символьную строку
   if (pattern == NULL) exit(1);
 
+
+
   while ((line = getline(&pattern, &leght, file) != EOF)) {
     count++;
     if ((mom = regexec(&rege, pattern, match_n, match_p, 0)) == 0) {
@@ -181,7 +182,7 @@ void reg_func(FILE* file, char* str_f, int argc) {  //,
     if (pattern[strlen(pattern) - 1] == 10) {
       pattern[strlen(pattern) - 1] = 0;
     }
-    if (!mom && !v && !c && !l) {
+    if (mom == 0 && !v && !c && !l && !o) {
       if ((argc - optind) > 1 && !h) {
         printf("%s:", str_f);
       }
@@ -190,15 +191,37 @@ void reg_func(FILE* file, char* str_f, int argc) {  //,
       }
       printf("%s\n", pattern);
     }
-    if (mom && v) {
+    if (mom != 0 && v && !o) {
       if ((argc - optind) > 1 && !h) {
         printf("%s:", str_f);
       }
       printf("%s\n", pattern);
     }
-    if (f) {
-      printf("%s\n", pattern);
-    }
+    
+  
+
+  if (o && !mom) {
+    // printf("1331\n");
+    char buffer_o[SIZE] = {0}; // size?
+    
+
+
+      
+  
+
+  
+  
+    // if(buffer_o == shablon)
+    // {
+      printf("%s", buffer_o);
+    // } else {
+    //   buffer_o[SIZE] = 0;
+    // }
+    //   printf("%s\n", shablon);
+  }
+  }
+  if (f && !mom) {  
+    printf("%s\n", pattern);
   }
   if (l) {
     printf("%s\n", str_f);
@@ -206,7 +229,6 @@ void reg_func(FILE* file, char* str_f, int argc) {  //,
   if (c) {
     printf("%d", done);
   }
-
   if (pattern) {
     free(pattern);
   }
