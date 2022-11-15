@@ -1,5 +1,4 @@
-// Copyright 2022 school 21 hokkienw
-#include "RRRs21_grep.h"
+#include "22222.h"
 
 int main(int argc, char *argv[]) {
   int ch;
@@ -140,8 +139,6 @@ void get_varriable(FILE *file_name, int argc, char *path) {
     }
   }
   tmp_line = (char *)calloc(len, sizeof(char));
-
-
   while ((rez = getline(&tmp_line, &len, file_name)) != EOF) {
     if ((success = regexec(&regex, tmp_line, nmatch, pmatch, 0)) == 0) {
       count_success++;
@@ -155,12 +152,12 @@ void get_varriable(FILE *file_name, int argc, char *path) {
       }
       if (nflag) {
         printf("%d:", count_line + 1);
-    }
+      }
       printf("%s\n", tmp_line);
     }
     if (vflag && !cflag && !lflag && success != 0) {
       if ((argc - optind) > 1 && !hflag) {
-       printf("%s:", path);
+        printf("%s:", path);
       }
       if (nflag) {
         printf("%d:", count_line + 1);
@@ -197,7 +194,6 @@ void get_varriable(FILE *file_name, int argc, char *path) {
     }
     count_line++;
   }
-  
   if (!vflag && cflag && !lflag) {
     if ((argc - optind) > 1 && !hflag) {
       printf("%s:", path);
@@ -219,12 +215,12 @@ void get_varriable(FILE *file_name, int argc, char *path) {
     } else {
       printf("%d\n", 0);
     }
-   }
+  }
   if (vflag && cflag && lflag) {
     if ((argc - optind) > 1 && !hflag) {
       printf("%s:", path);
     }
-    if ((count_line - count_success) > 0) { 
+    if ((count_line - count_success) > 0) {
       printf("%d\n", 1);
     } else {
       printf("%d\n", 0);
@@ -241,14 +237,3 @@ void get_varriable(FILE *file_name, int argc, char *path) {
   }
   regfree(&regex);
 }
-
-
-
-
-1  grep -ie INT test_5_grep.txt
-2  grep -noe ) test_5_grep.txt
-3  grep -noe ing -e as -e the -e not -e is test_6_grep.txt
-4  grep -c -e . test_1_grep.txt -e '.'
-5  grep -l for no_file.txt test_2_grep.txt
-6  grep -f test_3_grep.txt test_5_grep.txt
-7  grep -c -e /\ test_1_grep.txt

@@ -1,29 +1,20 @@
 #include "s21_grep.h"
 
 int main(int argc, char* argv[]) {
-  // if (argc != 1) {
-
   while (((gr = getopt_long(argc, argv, short_options, long_options, NULL)) !=
           -1)) {
-    //  printf("000");
     flags(gr, argv);
-    // printf("111");
   }
-  // printf("999");
   shablon_str(argv);
   input_file_open(argv, optind, argc);  // argc,
-  // reg_func();
-  // }
   return 0;
 }
 
 // чтение флагов
 void flags(int gr, char** argv) {
-  // printf("222");
   switch (gr) {
     case 'e':
       e++;
-      // printf("%d", e);
       shablon_str(argv);
       break;
     case 'i':
@@ -56,45 +47,40 @@ void flags(int gr, char** argv) {
       break;
     case '?':
     default:
-      printf("Флаг не распознан!\n");
+      fprintf(stderr, "Флаг не найден\n");  // оставить так?
       exit(1);
   }
 }
 // чтение шаблона из потока ввода
 void shablon_str(char** argv) {
-  // printf("333");  // char buf[SIZE];
-
-  char str[SIZE];
+  char str[SIZE] = {0};
   if (e == 0 && f == 0) {
     snprintf(shablon, sizeof(shablon), "%s", argv[optind]);
-    // printf("444");
     optind++;
   }
   if (e != 0 && f == 0) {
     if (shablon[0] == 0)
-      snprintf(shablon, sizeof(shablon), "%s", optarg);  // нужно optarg
+      snprintf(shablon, sizeof(shablon), "%s", optarg);
     else {
       snprintf(str, sizeof(shablon), "|%s", optarg);
       strcat(shablon, str);
     }
   }
   if (f) {
-    char f_pattern[SIZE] = {0};
+    char f_pattern[9000] = {0};
     FILE* f_file;
     char* f_str;
     f_str = optarg;
     if (f_str != NULL) {
       if ((f_file = fopen(f_str, "r"))) {
-        while ((fgets(f_pattern, SIZE, f_file)) != NULL)
-        {
+        while ((fgets(f_pattern, SIZE, f_file)) != NULL) {
           if (f_pattern[strlen(f_pattern) - 1] == 10) {
             f_pattern[strlen(f_pattern) - 1] = 0;
           }
           if (shablon[0] == 0)
-            snprintf(shablon, sizeof(shablon), "%s", f_pattern);  
+            snprintf(shablon, sizeof(shablon), "%s", f_pattern);
           else {
-            snprintf(str, sizeof(shablon), "|%s",
-                     f_pattern);
+            snprintf(str, sizeof(shablon), "|%s", f_pattern);
             strcat(shablon, str);
           }
         }
@@ -103,53 +89,48 @@ void shablon_str(char** argv) {
           perror("Файл не найден");
           exit(1);
         }
-      fclose(f_file);  // нужно ли закрывать?
+        fclose(f_file);  // нужно ли закрывать?
       }
     }
   }
 }
 
 // открытие и проверка файла, доработать
-void input_file_open(char** argv, int optind, int argc) { 
-  // printf("555");
+void input_file_open(char** argv, int optind, int argc) {
   FILE* file;
   int filename = optind;
   char* str_f;
   while ((str_f = argv[filename]) != NULL) {
     if (strcmp(str_f, "-") != 0 || str_f != 0) {
       if ((file = fopen(argv[filename], "r"))) {
-        reg_func(file, str_f, argc);  // str argc,
-        fclose(file);
+        reg_func(file, str_f, argc);
       } else {
         if (s == 0) {
           perror("Файл не найден");
           exit(1);
         }
       }
-      // printf("777");
     }
     filename++;
   }
 }
 
 // функция взаимодействия флагов и печать
-void reg_func(FILE* file, char* str_f, int argc) {  //,
-                                                    //  printf("888");
+void reg_func(FILE* file, char* str_f, int argc) {
   int a;
   regex_t rege;  // хранениe скомпилированного регулярного выражения
-  size_t match_n = 4, leght = 1000;  // длина массива структуры regmatch_t
-  regmatch_t match_p[4];
   int line, mom;
-  int done = 0, count = 0;
   char* pattern = NULL;
-
+  regmatch_t match_p[4];
+  int done = 0, count = 0;
+  size_t match_n = 4, leght = 1000;  // длина массива структуры regmatch_t
   /*____________________________________________________________________
    regmatch_t - это тип данных структуры, который определен
    в regex.h ::
    typedef struct
    {
-      regoff_t rm_so;
-      regoff_t rm_eo;
+      regoff_t rm_so;
+      regoff_t rm_eo;
    } regmatch_t;
    Элемент rm_so сохраняет начальную позицию соответствующей
    текстовой строки в целевой строке, а rm_eo сохраняет
@@ -167,12 +148,9 @@ void reg_func(FILE* file, char* str_f, int argc) {  //,
       exit(1);
     }
   }
-  // pattern = (char *)calloc(leght, sizeof(char));
   pattern = (char*)malloc(
       leght + 1);  // динамическое выделение памяти под символьную строку
   if (pattern == NULL) exit(1);
-
-
 
   while ((line = getline(&pattern, &leght, file) != EOF)) {
     count++;
@@ -182,7 +160,10 @@ void reg_func(FILE* file, char* str_f, int argc) {  //,
     if (pattern[strlen(pattern) - 1] == 10) {
       pattern[strlen(pattern) - 1] = 0;
     }
-    if (mom == 0 && !v && !c && !l && !o) {
+
+    if (!c) {
+
+      if (mom == 0 && !v && !l && !o) {
       if ((argc - optind) > 1 && !h) {
         printf("%s:", str_f);
       }
@@ -191,47 +172,91 @@ void reg_func(FILE* file, char* str_f, int argc) {  //,
       }
       printf("%s\n", pattern);
     }
-    if (mom != 0 && v && !o) {
+    if (mom != 0 && v && !l) {  // нужно ли добавить флаг О?
       if ((argc - optind) > 1 && !h) {
         printf("%s:", str_f);
       }
+      if (n) {
+        printf("%d:", count);
+      }
       printf("%s\n", pattern);
     }
-    
-  
-
-  if (o && !mom) {
-    // printf("1331\n");
-    char buffer_o[SIZE] = {0}; // size?
-    
-
-
-      
-  
-
-  
-  
-    // if(buffer_o == shablon)
-    // {
-      printf("%s", buffer_o);
-    // } else {
-    //   buffer_o[SIZE] = 0;
-    // }
-    //   printf("%s\n", shablon);
+    if (mom == 0 && !v && !l && o) {
+      if ((argc - optind) > 1 && !h) {
+        printf("%s:", str_f);
+      }
+      if (n) {
+        printf("%d:", count);
+      }
+      char* o_str = pattern;
+      for (unsigned int l = 0; l < strlen(o_str); l++) {
+        if (regexec(&rege, o_str, match_n, match_p, 0)) {
+          break;
+        }
+        unsigned int end = 0;
+        for (size_t g = 0; g <= match_n; g++) {
+          if (match_p[g].rm_so == -1) {
+            break;
+          }
+          if (g == 0) {
+            end = match_p[g].rm_eo;
+          }
+          char buffer[strlen(o_str) + 1];
+          strcpy(buffer, o_str);
+          buffer[match_p[g].rm_eo] = 0;
+          printf("%s\n", (buffer + match_p[g].rm_so));
+        }
+        o_str += end;
+      }
+    }
+    }    
   }
+  
+if (c) {
+  if (!v && !l ) {
+    if ((argc - optind) > 1 && !h) {
+        printf("%s:", str_f);
+      }
+    printf("%d\n", done);
   }
-  if (f && !mom) {  
-    printf("%s\n", pattern);
+  if (v && !l) {
+      if ((argc - optind) > 1 && !h) {
+        printf("%s:", str_f);
+      }
+    printf("%d\n", (count - done));
   }
-  if (l) {
+  if (!v && l) {
+          if ((argc - optind) > 1 && !h) {
+        printf("%s:", str_f);
+      }
+    if (done > 0) { // зачем?
+      printf("%d\n", 1);
+    } else {
+      printf("%d\n", 0);
+    }
+   }
+  if (v && l) {
+    if ((argc - optind) > 1 && !h) {
+        printf("%s:", str_f);
+      }
+    if ((count - done) > 0) { 
+      printf("%d\n", 1); // зачем?
+    } else {
+      printf("%d\n", 0);
+    }
+  }
+}
+
+
+  if (l != 0 && done > 0) {
     printf("%s\n", str_f);
   }
-  if (c) {
-    printf("%d", done);
+  if (v != 0 && l && done == 0) {
+    printf("%s\n", str_f);
   }
+
   if (pattern) {
     free(pattern);
   }
-
   regfree(&rege);
 }
