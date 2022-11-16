@@ -245,10 +245,10 @@ void get_varriable(FILE *file_name, int argc, char *path) {
 
 
 
-1  grep -ie INT test_5_grep.txt
-2  grep -noe ) test_5_grep.txt
-3  grep -noe ing -e as -e the -e not -e is test_6_grep.txt
-4  grep -c -e . test_1_grep.txt -e '.'
-5  grep -l for no_file.txt test_2_grep.txt
-6  grep -f test_3_grep.txt test_5_grep.txt
-7  grep -c -e /\ test_1_grep.txt
+// 1  grep -ie INT test_5_grep.txt
+// 2  grep -noe ) test_5_grep.txt
+// 3  grep -noe ing -e as -e the -e not -e is test_6_grep.txt
+// 4  grep -c -e . test_1_grep.txt -e '.'
+// 5  grep -l for no_file.txt test_2_grep.txt
+// 6  grep -f test_3_grep.txt test_5_grep.txt
+// 7  grep -c -e /\ test_1_grep.txt
