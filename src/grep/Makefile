@@ -13,5 +13,5 @@ s21_grep.o : s21_grep.c s21_grep.h
 clean :
 	rm -rf *.o s21_grep
 
-rebuild : make clean
-	make all
+rebuild : clean
+	all

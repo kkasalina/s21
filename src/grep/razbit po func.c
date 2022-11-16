@@ -96,10 +96,21 @@ void reg_func(FILE* file, char* str_f, int argc) {
   int line, mom;
   int done = 0, count = 0;
   char* pattern = NULL;
-  Reg_start();
-  pattern = (char*)malloc(
-      leght + 1);  // динамическое выделение памяти под символьную строку
-  if (pattern == NULL) exit(1);
+
+  /*____________________________________________________________________
+   regmatch_t - это тип данных структуры, который определен
+   в regex.h ::
+   typedef struct
+   {
+      regoff_t rm_so;
+      regoff_t rm_eo;
+   } regmatch_t;
+   Элемент rm_so сохраняет начальную позицию соответствующей
+   текстовой строки в целевой строке, а rm_eo сохраняет
+   конечную позицию
+  ____________________________________________________________________*/
+
+  Reg_start(pattern);
 
   while ((line = getline(&pattern, &leght, file) != EOF)) {
     count++;
@@ -201,7 +212,7 @@ void Flag_F(char* str) {
   f_str = optarg;
   if (f_str != NULL) {
     if ((f_file = fopen(f_str, "r"))) {
-      while ((fgets(f_pattern, 9000, f_file)) != NULL) {
+      while ((fgets(f_pattern, SIZE, f_file)) != NULL) {
         if (f_pattern[strlen(f_pattern) - 1] == 10) {
           f_pattern[strlen(f_pattern) - 1] = 0;
         }
@@ -222,7 +233,7 @@ void Flag_F(char* str) {
   }
 }
 
-void Reg_start() {
+void Reg_start(char* pattern) {
   int a;
   if (i) {
     if ((a = regcomp(&rege, shablon, REG_ICASE)) != 0) {
@@ -235,6 +246,9 @@ void Reg_start() {
       exit(1);
     }
   }
+  pattern = (char*)malloc(
+      leght + 1);  // динамическое выделение памяти под символьную строку
+  if (pattern == NULL) exit(1);
 }
 
 void Flag_No_H(int argc, char* str_f) {
