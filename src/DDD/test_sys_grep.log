@@ -1,0 +1,298 @@
+s21_grep.c:1:#include "s21_grep.h"
+s21_grep.c:2:
+s21_grep.c:3:int main(int argc, char **argv) {
+s21_grep.c:4:  struct line_const tom = {0};
+s21_grep.c:5:  options flags = {0};
+s21_grep.c:6:
+s21_grep.c:7:  int opt;
+s21_grep.c:8:  while ((opt = getopt_long(argc, argv, short_options, long_options, NULL)) !=
+s21_grep.c:9:         -1) {
+s21_grep.c:10:    Flags(opt, argv, &flags);
+s21_grep.c:11:  }
+s21_grep.c:12:  pattern(argv, &flags);
+s21_grep.c:13:  Read_file(argv, argc, optind, &flags, tom);
+s21_grep.c:14:  return 0;
+s21_grep.c:15:}
+s21_grep.c:16:
+s21_grep.c:17:void Flags(char f, char **argv, options *flags) {
+s21_grep.c:18:  switch (f) {
+s21_grep.c:19:    case 'e':
+s21_grep.c:20:      flags->flag_e = 1;
+s21_grep.c:21:      pattern(argv, flags);
+s21_grep.c:22:      break;
+s21_grep.c:23:    case 'i':
+s21_grep.c:24:      flags->flag_i = 1;
+s21_grep.c:25:      break;
+s21_grep.c:26:    case 'v':
+s21_grep.c:27:      flags->flag_v = 1;
+s21_grep.c:28:      break;
+s21_grep.c:29:    case 'c':
+s21_grep.c:30:      flags->flag_c = 1;
+s21_grep.c:31:      break;
+s21_grep.c:32:    case 'l':
+s21_grep.c:33:      flags->flag_l = 1;
+s21_grep.c:34:      break;
+s21_grep.c:35:    case 'n':
+s21_grep.c:36:      flags->flag_n = 1;
+s21_grep.c:37:      break;
+s21_grep.c:38:    case 'h':
+s21_grep.c:39:      flags->flag_h = 1;
+s21_grep.c:40:      break;
+s21_grep.c:41:    case 's':
+s21_grep.c:42:      flags->flag_s = 1;
+s21_grep.c:43:      break;
+s21_grep.c:44:    case 'f':
+s21_grep.c:45:      flags->flag_f = 1;
+s21_grep.c:46:      pattern(argv, flags);
+s21_grep.c:47:      break;
+s21_grep.c:48:    case 'o':
+s21_grep.c:49:      flags->flag_o = 1;
+s21_grep.c:50:      break;
+s21_grep.c:51:    case '?':
+s21_grep.c:52:    default:
+s21_grep.c:53:      fprintf(stderr, "Флаг не найден\n");
+s21_grep.c:54:      exit(1);
+s21_grep.c:55:  }
+s21_grep.c:56:}
+s21_grep.c:57:
+s21_grep.c:58:void Read_file(char **argv, int argc, int optind, options *flags,
+s21_grep.c:59:               struct line_const tom) {
+s21_grep.c:60:  FILE *fileop;
+s21_grep.c:61:  char *names;
+s21_grep.c:62:  int i = optind;
+s21_grep.c:63:  while ((names = argv[i]) != NULL) {
+s21_grep.c:64:    if (names != 0 || strcmp(names, "-") != 0) {
+s21_grep.c:65:      if ((fileop = fopen(names, "r"))) {
+s21_grep.c:66:        kolizz(fileop, argc, names, flags, tom);
+s21_grep.c:67:        fclose(fileop);
+s21_grep.c:68:      } else {
+s21_grep.c:69:        if (!flags->flag_s) {
+s21_grep.c:70:          perror("Ошибка чтения");
+s21_grep.c:71:          exit(1);
+s21_grep.c:72:        }
+s21_grep.c:73:      }
+s21_grep.c:74:    }
+s21_grep.c:75:    i++;
+s21_grep.c:76:  }
+s21_grep.c:77:}
+s21_grep.c:78:
+s21_grep.c:79:void pattern(char **argv, options *flags) {
+s21_grep.c:80:  char buffer[9000] = {0};
+s21_grep.c:81:  if (!flags->flag_e && !flags->flag_f) {
+s21_grep.c:82:    snprintf(patt, sizeof(patt), "%s", argv[optind]);
+s21_grep.c:83:    optind++;
+s21_grep.c:84:  }
+s21_grep.c:85:  if (flags->flag_e && !flags->flag_f) {
+s21_grep.c:86:    if (patt[0] == 0) {
+s21_grep.c:87:      snprintf(patt, sizeof(patt), "%s", optarg);
+s21_grep.c:88:    } else {
+s21_grep.c:89:      snprintf(buffer, sizeof(patt), "|%s", optarg);
+s21_grep.c:90:      strcat(patt, buffer);
+s21_grep.c:91:    }
+s21_grep.c:92:  }
+s21_grep.c:93:  if (flags->flag_f) {
+s21_grep.c:94:    FILE *fileop_f;
+s21_grep.c:95:    char *p = optarg;
+s21_grep.c:96:    char line_f[1010] = {0};
+s21_grep.c:97:    if (p != NULL) {
+s21_grep.c:98:      if ((fileop_f = fopen(p, "r"))) {
+s21_grep.c:99:        while ((fgets(line_f, line_size, fileop_f)) != NULL) {
+s21_grep.c:100:          if (line_f[strlen(line_f) - 1] == 10) {
+s21_grep.c:101:            line_f[strlen(line_f) - 1] = 0;
+s21_grep.c:102:          }
+s21_grep.c:103:          if (patt[0] == 0) {
+s21_grep.c:104:            snprintf(patt, sizeof(patt), "%s", line_f);
+s21_grep.c:105:          } else {
+s21_grep.c:106:            snprintf(buffer, sizeof(patt), "|%s", line_f);
+s21_grep.c:107:            strcat(patt, buffer);
+s21_grep.c:108:          }
+s21_grep.c:109:        }
+s21_grep.c:110:      } else {
+s21_grep.c:111:        if (!flags->flag_s) {
+s21_grep.c:112:          perror("Ошибка чтения");
+s21_grep.c:113:          exit(1);
+s21_grep.c:114:        }
+s21_grep.c:115:      }
+s21_grep.c:116:    }
+s21_grep.c:117:  }
+s21_grep.c:118:}
+s21_grep.c:119:
+s21_grep.c:120:void kolizz(FILE *fileop, int argc, char *p, options *flags,
+s21_grep.c:121:            struct line_const tom) {
+s21_grep.c:122:  Reg_memory(flags, tom);
+s21_grep.c:123:  t_line = (char *)malloc(line + 1);
+s21_grep.c:124:  if (t_line == NULL) {
+s21_grep.c:125:    exit(1);
+s21_grep.c:126:  }
+s21_grep.c:127:  while (((tom.re_ez = getline(&t_line, &line, fileop)) != EOF)) {
+s21_grep.c:128:    tom.c_line++;
+s21_grep.c:129:    if ((tom.complete = regexec(&regex, t_line, n_mat, p_mat, 0)) == 0)
+s21_grep.c:130:      tom.complete_c++;
+s21_grep.c:131:    if (t_line[strlen(t_line) - 1] == 10) (t_line[strlen(t_line) - 1] = 0);
+s21_grep.c:132:    if (tom.complete == 0 && !flags->flag_v && !flags->flag_c &&
+s21_grep.c:133:        !flags->flag_l && !flags->flag_o) {
+s21_grep.c:134:      No_Flag_H(argc, p, flags);
+s21_grep.c:135:      if (flags->flag_n) {
+s21_grep.c:136:        printf("%d:", tom.c_line);
+s21_grep.c:137:      }
+s21_grep.c:138:      printf("%s\n", t_line);
+s21_grep.c:139:    }
+s21_grep.c:140:    if (flags->flag_v) {
+s21_grep.c:141:      Flag_V(argc, p, flags, tom);
+s21_grep.c:142:    }
+s21_grep.c:143:    if (flags->flag_o) {
+s21_grep.c:144:      Flag_O(argc, p, flags, tom);
+s21_grep.c:145:    }
+s21_grep.c:146:  }
+s21_grep.c:147:  if (!flags->flag_v && flags->flag_c && !flags->flag_l) {
+s21_grep.c:148:    No_Flag_H(argc, p, flags);
+s21_grep.c:149:    printf("%d\n", tom.complete_c);
+s21_grep.c:150:  }
+s21_grep.c:151:  if (flags->flag_v && flags->flag_c && !flags->flag_l) {
+s21_grep.c:152:    No_Flag_H(argc, p, flags);
+s21_grep.c:153:    printf("%d\n", (tom.c_line - tom.complete_c));
+s21_grep.c:154:  }
+s21_grep.c:155:  if (!flags->flag_v && flags->flag_c && flags->flag_l) {
+s21_grep.c:156:    No_Flag_H(argc, p, flags);
+s21_grep.c:157:    if (tom.complete_c > 0)
+s21_grep.c:158:      printf("%d\n", 1);
+s21_grep.c:159:    else
+s21_grep.c:160:      printf("%d\n", 0);
+s21_grep.c:161:  }
+s21_grep.c:162:  if (flags->flag_v && flags->flag_c && flags->flag_l) {
+s21_grep.c:163:    No_Flag_H(argc, p, flags);
+s21_grep.c:164:    if ((tom.c_line - tom.complete_c) > 0)
+s21_grep.c:165:      printf("%d\n", 1);
+s21_grep.c:166:    else
+s21_grep.c:167:      printf("%d\n", 0);
+s21_grep.c:168:  }
+s21_grep.c:169:  if (flags->flag_l && tom.complete_c > 0) printf("%s\n", p);
+s21_grep.c:170:  if (flags->flag_l && flags->flag_v && tom.complete_c == 0) printf("%s\n", p);
+s21_grep.c:171:  if (t_line) free(t_line);
+s21_grep.c:172:  regfree(&regex);
+s21_grep.c:173:}
+s21_grep.c:174:
+s21_grep.c:175:void Flag_V(int argc, char *p, options *flags, struct line_const tom) {
+s21_grep.c:176:  if (tom.complete != 0 && flags->flag_v && !flags->flag_c && !flags->flag_l) {
+s21_grep.c:177:    No_Flag_H(argc, p, flags);
+s21_grep.c:178:    if (flags->flag_n) {
+s21_grep.c:179:      printf("%d:", tom.c_line);
+s21_grep.c:180:    }
+s21_grep.c:181:    printf("%s\n", t_line);
+s21_grep.c:182:  }
+s21_grep.c:183:}
+s21_grep.c:184:
+s21_grep.c:185:void Flag_O(int argc, char *p, options *flags, struct line_const tom) {
+s21_grep.c:186:  if (tom.complete == 0 && flags->flag_o && !flags->flag_v && !flags->flag_c &&
+s21_grep.c:187:      !flags->flag_l) {
+s21_grep.c:188:    No_Flag_H(argc, p, flags);
+s21_grep.c:189:    if (flags->flag_n) printf("%d:", tom.c_line);
+s21_grep.c:190:    char *t_line_o = t_line;
+s21_grep.c:192:      if (regexec(&regex, t_line_o, n_mat, p_mat, 0)) break;
+s21_grep.c:193:      unsigned int of = 0;
+s21_grep.c:195:        if (p_mat[k].rm_so == -1) break;
+s21_grep.c:196:        if (k == 0) of = p_mat[k].rm_eo;
+s21_grep.c:197:        char line_c[strlen(t_line_o) + 1];
+s21_grep.c:198:        strcpy(line_c, t_line_o);
+s21_grep.c:199:        line_c[p_mat[k].rm_eo] = 0;
+s21_grep.c:200:        printf("%s\n", (line_c + p_mat[k].rm_so));
+s21_grep.c:201:      }
+s21_grep.c:202:      t_line_o += of;
+s21_grep.c:203:    }
+s21_grep.c:204:  }
+s21_grep.c:205:}
+s21_grep.c:206:
+s21_grep.c:207:void No_Flag_H(int argc, char *p, options *flags) {
+s21_grep.c:208:  if ((argc - optind) > 1 && !(flags->flag_h)) printf("%s:", p);
+s21_grep.c:209:}
+s21_grep.c:210:
+s21_grep.c:211:void Reg_memory(options *flags, struct line_const tom) {
+s21_grep.c:212:  if (flags->flag_i) {
+s21_grep.c:213:    if ((tom.reg_c = regcomp(&regex, patt, REG_ICASE)) != 0) {
+s21_grep.c:214:      printf("failed %d", tom.reg_c);
+s21_grep.c:215:      exit(1);
+s21_grep.c:216:    }
+s21_grep.c:217:  } else {
+s21_grep.c:218:    if ((tom.reg_c = regcomp(&regex, patt, REG_EXTENDED)) != 0) {
+s21_grep.c:219:      printf("failed %d", tom.reg_c);
+s21_grep.c:220:      exit(1);
+s21_grep.c:221:    }
+s21_grep.c:222:  }
+s21_grep.c:223:}
+s21_grep.h:1:#ifndef SRC_S21_CAT_H_
+s21_grep.h:2:#define SRC_S21_CAT_H_
+s21_grep.h:3:
+s21_grep.h:4:#include <getopt.h>
+s21_grep.h:5:#include <regex.h>
+s21_grep.h:6:#include <stdio.h>
+s21_grep.h:7:#include <stdlib.h>
+s21_grep.h:8:#include <string.h>
+s21_grep.h:9:#include <unistd.h>
+s21_grep.h:10:
+s21_grep.h:11:#define size_patt 9000
+s21_grep.h:12:#define const_char 4
+s21_grep.h:13:#define line_size 1000
+s21_grep.h:14:
+s21_grep.h:15:typedef struct {
+s21_grep.h:16:  int flag_e;  // Шаблон
+s21_grep.h:17:  int flag_i;  // Игнорирует различия регистра.
+s21_grep.h:18:  int flag_v;  // Инвертирует смысл поиска соответствий.
+s21_grep.h:19:  int flag_c;  // Выводит только количество совпадающих строк.
+s21_grep.h:20:  int flag_l;  // Выводит только совпадающие файлы.
+s21_grep.h:21:  int flag_n;  // Предваряет каждую строку вывода номером строки из файла ввода.
+s21_grep.h:22:  int flag_h;  // Выводит совпадающие строки, не предваряя их именами файлов.
+s21_grep.h:23:  int flag_s;  // Подавляет сообщения об ошибках о несуществующих или нечитаемых
+s21_grep.h:24:               // файлах.
+s21_grep.h:25:  int flag_f;  // Получает регулярные выражения из файла.
+s21_grep.h:26:  int flag_o;  // Печатает только совпадающие (непустые) части совпавшей строки.
+s21_grep.h:27:} options;
+s21_grep.h:28:
+s21_grep.h:29:struct line_const {  // tom
+s21_grep.h:30:  int reg_c;
+s21_grep.h:31:  int re_ez;
+s21_grep.h:32:  int c_line;
+s21_grep.h:33:  int complete;
+s21_grep.h:34:  int complete_c;
+s21_grep.h:35:};
+s21_grep.h:36:
+s21_grep.h:37:const char *short_options = "e:ivclnhsf:o?";
+s21_grep.h:38:static struct option long_options[] = {
+s21_grep.h:39:    {NULL, 0, NULL, 0},
+s21_grep.h:40:};
+s21_grep.h:41:
+s21_grep.h:42:char *t_line = NULL;
+s21_grep.h:43:regex_t regex;
+s21_grep.h:44:size_t line = line_size;
+s21_grep.h:45:size_t n_mat = const_char;
+s21_grep.h:46:regmatch_t p_mat[const_char];
+s21_grep.h:47:char patt[size_patt] = {0};
+s21_grep.h:48:
+s21_grep.h:49:void Read_file(char **argv, int argc, int optind, options *flags,
+s21_grep.h:50:               struct line_const);                //чтение файла
+s21_grep.h:51:void Flags(char f, char **argv, options *flags);  // выбор флага
+s21_grep.h:52:void pattern(char **argv, options *flags);
+s21_grep.h:53:void kolizz(FILE *fileop, int argc, char *p, options *flags,
+s21_grep.h:54:            struct line_const);  //функция отработки флагов
+s21_grep.h:55:void Flag_V(int argc, char *p, options *flags, struct line_const);
+s21_grep.h:56:void Flag_O(int argc, char *p, options *flags, struct line_const);
+s21_grep.h:57:void No_Flag_H(int argc, char *p, options *flags);
+s21_grep.h:58:void Reg_memory(options *flags, struct line_const);
+s21_grep.h:59:
+s21_grep.h:60:#endif  // SRC_GREP_H_
+Makefile:1:GCC = gcc
+Makefile:2:GCC1 = gcc -c -Wall -Werror -Wextra
+Makefile:3:
+Makefile:4:all : s21_grep
+Makefile:5:
+Makefile:6:s21_grep : s21_grep.o
+Makefile:7:	$(GCC) s21_grep.o -o s21_grep
+Makefile:8:	rm -rf *.o
+Makefile:9:
+Makefile:10:s21_grep.o : s21_grep.c s21_grep.h
+Makefile:11:	$(GCC) s21_grep.c -c
+Makefile:12:
+Makefile:13:clean :
+Makefile:14:	rm -rf *.o s21_grep
+Makefile:15:
+Makefile:16:rebuild : clean
+Makefile:17:	all
