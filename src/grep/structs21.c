@@ -1,54 +1,55 @@
 #include "s21_grep.h"
 
 int main(int argc, char* argv[]) {
+  char gr;
+  char shablon[SIZE] = {0};
+  all_flags unit = {0};
+  count inv; // = {0, 0};
   
-  flagsA all = {0};
-  int gr;
   while (((gr = getopt_long(argc, argv, short_options, long_options, NULL)) !=
           -1)) {
-    flags(gr, argv, &all);
-    
+    flags(gr, argv, &unit, shablon);
   }
-  
-  shablon_str(argv, &all);
-  input_file_open(argv, optind, argc, &all);
+  shablon_str(argv, &unit, shablon);
+  input_file_open(argv, optind, argc, &unit, &inv, shablon);
   return 0;
 }
 
 // чтение флагов
-void flags(int gr, char** argv, flagsA *all) {
+void flags(char gr, char** argv, all_flags *unit, char* shablon) {
+  
   switch (gr) {
     case 'e':
-      all->e = 1;
-      shablon_str(argv, all);
+      unit->e = 1;
+      shablon_str(argv, unit, shablon);
       break;
     case 'i':
-      all->i = 1;
+      unit->i = 1;
       break;
     case 'v':
-      all->v = 1;
+      unit->v = 1;
       break;
     case 'c':
-      all->c = 1;
+      unit->c = 1;
       break;
     case 'l':
-      all->l = 1;
+      unit->l = 1;
       break;
     case 'n':
-      all->n = 1;
+      unit->n = 1;
       break;
     case 'h':
-      all->h = 1;
+      unit->h = 1;
       break;
     case 's':
-      all->s = 1;
+      unit->s = 1;
       break;
     case 'f':
-      all->f = 1;
-      shablon_str(argv, all);
+      unit->f = 1;
+      shablon_str(argv, unit, shablon);
       break;
     case 'o':
-      all->o = 1;
+      unit->o = 1;
       break;
     case '?':
     default:
@@ -57,15 +58,13 @@ void flags(int gr, char** argv, flagsA *all) {
   }
 }
 // чтение шаблона из потока ввода
-void shablon_str(char** argv, flagsA *all) {
-  
-  char shablon[SIZE];
+void shablon_str(char** argv, all_flags *unit, char* shablon) {
   char str[SIZE] = {0};
-  if (all->e == 0 && all->f == 0) {
+  if (unit->e == 0 && unit->f == 0) {
     snprintf(shablon, sizeof(shablon), "%s", argv[optind]);
     optind++;
   }
-  if (all->e != 0 && all->f == 0) {
+  if (unit->e != 0 && unit->f == 0) {
     if (shablon[0] == 0)
       snprintf(shablon, sizeof(shablon), "%s", optarg);
     else {
@@ -73,24 +72,22 @@ void shablon_str(char** argv, flagsA *all) {
       strcat(shablon, str);
     }
   }
-  if (all->f) {
-    Flag_F(str, all);
+  if (unit->f) {
+    Flag_F(str, unit, shablon);
   }
 }
 
 // открытие и проверка файла, доработать
-void input_file_open(char** argv, int optind, int argc, flagsA *all) {
-  
+void input_file_open(char** argv, int optind, int argc, all_flags *unit, count *inv, char* shablon) {
   FILE* file;
   int filename = optind;
   char* str_f;
   while ((str_f = argv[filename]) != NULL) {
     if (strcmp(str_f, "-") != 0 || str_f != 0) {
       if ((file = fopen(argv[filename], "r"))) {
-        reg_func(file, str_f, argc, all);
-        fclose(file);
+        reg_func(file, str_f, argc, unit, inv, shablon);
       } else {
-        if ((all->s) == 0) {
+        if (unit->s == 0) {
           perror("Файл не найден");
           exit(1);
         }
@@ -101,44 +98,45 @@ void input_file_open(char** argv, int optind, int argc, flagsA *all) {
 }
 
 // функция взаимодействия флагов и печать
-void reg_func(FILE* file, char* str_f, int argc, flagsA *all) {
-  // printf("%d %d %d %d %d %d %d %d %d %d\n", all->e, all->i, all->v, all->c, all->l, all->n, all->h, all->s, all->f, all->o);
-  int line, mom;
-  int done = 0, count = 0;
+void reg_func(FILE* file, char* str_f, int argc, all_flags *unit, count *inv, char* shablon) {
+  int line = 0;
+  int done = 0;
+  inv->count = 0;
+  inv->mom = 0;
   char* pattern = NULL;
-  Reg_start(all);
+  Reg_start(unit, shablon);
   pattern = (char*)malloc(
       leght + 1);  // динамическое выделение памяти под символьную строку
   if (pattern == NULL) exit(1);
 
   while ((line = getline(&pattern, &leght, file) != EOF)) {
-    count++;
-    if ((mom = regexec(&rege, pattern, match_n, match_p, 0)) == 0) {
+    inv->count++;
+    if ((inv->mom = regexec(&rege, pattern, match_n, match_p, 0)) == 0) {
       done++;
     }
     if (pattern[strlen(pattern) - 1] == 10) {
       pattern[strlen(pattern) - 1] = 0;
     }
 
-    // if (!all->c) {
-      if (mom == 0 && !all->v && !all->l && !all->o && !all->c) {
-        Flag_No_H(argc, str_f, all);
-        if (all->n) {
-          printf("%d:", count);
+    if (!unit->c) {
+      if (inv->mom == 0 && !unit->v && !unit->l && !unit->o) {
+        Flag_No_H(argc, str_f, unit);
+        if (unit->n) {
+          printf("%d:", inv->count);
         }
         printf("%s\n", pattern);
       }
-      if (mom != 0 && all->v && !all->l && !all->c) {
-        Flag_No_H(argc, str_f, all);
-        if (all->n) {
-          printf("%d:", count);
+      if (inv->mom != 0 && unit->v && !unit->l) {  // нужно ли добавить флаг О?
+        Flag_No_H(argc, str_f, unit);
+        if (unit->n) {
+          printf("%d:", inv->count);
         }
         printf("%s\n", pattern);
       }
-      if (mom == 0 && !all->v && !all->l && all->o && !all->c) {
-        Flag_No_H(argc, str_f, all);
-        if (all->n) {
-          printf("%d:", count);
+      if (inv->mom == 0 && !unit->v && !unit->l && unit->o) {
+        Flag_No_H(argc, str_f, unit);
+        if (unit->n) {
+          printf("%d:", inv->count);
         }
         char* o_str = pattern;
         for (unsigned int l = 0; l < strlen(o_str); l++) {
@@ -161,49 +159,51 @@ void reg_func(FILE* file, char* str_f, int argc, flagsA *all) {
           o_str += end;
         }
       }
-    // }
+    }
   }
 
-  // if (all->c) {
-    if (!all->v && !all->l && all->c) {
-      Flag_No_H(argc, str_f, all);
+  if (unit->c) {
+    if (!unit->v && !unit->l) {
+      Flag_No_H(argc, str_f, unit);
       printf("%d\n", done);
     }
-    if (all->v && !all->l && all->c) {
-      Flag_No_H(argc, str_f, all);
-      printf("%d\n", (count - done));
+    if (unit->v && !unit->l) {
+      Flag_No_H(argc, str_f, unit);
+      printf("%d\n", (inv->count - done));
     }
-    if (!all->v && all->l && all->c) {
-      Flag_No_H(argc, str_f, all);
-      if (done > 0) {  // зачем?
+    if (unit->v && unit->l) {
+      Flag_No_H(argc, str_f, unit);
+      if ((inv->count - done) > 0) {
+        printf("%d\n", 1);  // зачем?
+      } else {
+        printf("%d\n", 0);
+      }
+    }
+    if (!unit->v && unit->l) {
+      Flag_No_H(argc, str_f, unit);
+      if (done > 0) {
         printf("%d\n", 1);
       } else {
         printf("%d\n", 0);
       }
     }
-    if (all->v && all->l && all->c) {
-      Flag_No_H(argc, str_f, all);
-      if ((count - done) > 0) {
-        printf("%d\n", 1);  // зачем?
-      } else {
-        printf("%d\n", 0);
-      }
-    // }
+
   }
 
-  if (all->l != 0 && done > 0) {
+  if (unit->l != 0 && done > 0) {
     printf("%s\n", str_f);
   }
-  if (all->v != 0 && all->l && done == 0) {
+  if (unit->v != 0 && unit->l && done == 0) {
     printf("%s\n", str_f);
   }
+
   if (pattern) {
     free(pattern);
   }
   regfree(&rege);
 }
 
-void Flag_F(char* str, flagsA *all) {
+void Flag_F(char* str, all_flags *unit, char* shablon) {
   char f_pattern[9000] = {0};
   FILE* f_file;
   char* f_str;
@@ -222,7 +222,7 @@ void Flag_F(char* str, flagsA *all) {
         }
       }
     } else {
-      if (all->s == 0) {
+      if (unit->s == 0) {
         perror("Файл не найден");
         exit(1);
       }
@@ -231,9 +231,9 @@ void Flag_F(char* str, flagsA *all) {
   }
 }
 
-void Reg_start(flagsA *all) {
+void Reg_start(all_flags *unit, char* shablon) {
   int a;
-  if (all->i) {
+  if (unit->i) {
     if ((a = regcomp(&rege, shablon, REG_ICASE)) != 0) {
       printf("failed - %d", a);
       exit(1);
@@ -246,8 +246,8 @@ void Reg_start(flagsA *all) {
   }
 }
 
-void Flag_No_H(int argc, char* str_f, flagsA *all) {
-  if ((argc - optind) > 1 && !(all->h)) {
+void Flag_No_H(int argc, char* str_f, all_flags *unit) {
+  if ((argc - optind) > 1 && !unit->h) {
     printf("%s:", str_f);
   }
 }

@@ -1,17 +1,19 @@
-GCC = gcc
-GCC1 = gcc -c -Wall -Werror -Wextra
+ALL: clean s21_grep
 
-all : s21_grep
+s21_grep:
+	gcc -Wall -Werror -Wextra s21_grep.c -o s21_grep
 
-s21_grep : s21_grep.o
-	$(GCC) s21_grep.o -o s21_grep
-	rm -rf *.o
+clean:
+	rm -rf s21_grep
 
-s21_grep.o : s21_grep.c s21_grep.h
-	$(GCC) s21_grep.c -c
+test_func:ALL
+	sh test_func_grep.sh
 
-clean :
-	rm -rf *.o s21_grep
+test_leak:ALL
+	sh test_leak_grep.sh
 
-rebuild : clean
-	all
+style:
+	clang-format -i s21_grep.c
+	clang-format -i s21_grep.h
+	clang-format -n s21_grep.c
+	clang-format -n s21_grep.h
