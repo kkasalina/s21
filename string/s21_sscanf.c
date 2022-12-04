@@ -3,9 +3,12 @@
  #include <string.h>
  #include <stdlib.h>
 
-static char *tokenstring = "sgggh 4rf56gefr ";
+static char *tokenstring = "sgggp 5 ";
 /*static*/ char s[81];
 char* res = NULL;
+char p[81];
+size_t i = 0;
+size_t j = 0;
 
 
 int formatFlags(const char *format) {
@@ -20,38 +23,56 @@ int formatFlags(const char *format) {
 
 char *s21_sscanf(const char *str, const char *format, ...) {
   // printf("%s", format);
-
-  if(formatFlags(format) != 0) {
-    va_list arg;
-    va_start(arg, *format);
-    // char *f = (char*)format;
-    // char *f = va_arg(arg, char*);
-    for (size_t i = 0; i < (strlen(format)); i++) {
-      if (format[i] == '%') {
-        i++;
-        if (format[i] == 's') {
-          for(size_t j = 0; str[j] != ' '; j++) {
-            s[j] = str[j];
+  // printf(" %d 2-", p);
+  int leght = strlen(str);
+      if(formatFlags(format) != 0) { 
+        while (leght != 0) {
+          va_list arg;
+          va_start(arg, *format);
+          // char *f = (char*)format;
+          // printf("3- %d", p);
+          for ( ; i < (strlen(format)); i++) {
+            if (format[i] == '%') {
+              i++;
+              if (format[i] == 's') {
+                for(; str[j] != ' '; j++) {
+                  s[j] = str[j];
+                }
+              res = s;
+                continue; 
+            }
+            }
+          if (format[i] == 'd') {
+                for( ; str[j] != '\0'; j++) {
+                  // if (str[j] != ' ')
+                  // printf("%c\n", str[j]);
+                        *p = va_arg(arg, int);  
+                        p[j] = str[j];
+                }
+              // res = (char)f;
+                continue; 
+            } else {
+              putchar(format[i]);
+            } 
+            // i--;
+            format++;
           }
-         res = s;
-          continue; 
+          va_end(arg);      
+          leght--;
+        } 
       } else {
-        putchar(format[i]);
-      } 
-      i--;
-    }
-  }
-  va_end(arg);
-  } else {
-    printf("ERROR"); // поменять на функцию
-    exit(1);
-  } 
+        printf("ERROR"); // поменять на функцию
+        exit(1);
+      }
+
   return res;
 }
 
 int main() {
-  res = s21_sscanf(tokenstring, "%s", s);
-  if (res != NULL) printf("%s ", s);
+
+// printf("1- %d", p);
+  res = s21_sscanf(tokenstring, "%s %d", s, p);
+  if (res != NULL) printf("%s %s", s, p);
   return 0;
 }
                
