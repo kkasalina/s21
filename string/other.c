@@ -107,63 +107,49 @@ void *trim(
                                // все начальные и конечные вхождения набора
                                // заданных символов (trim_chars) из данной
                                // строки (src). В случае ошибки вернуть NULL
-
   char *arr = NULL;
   int inerror = 0;
+  // int flag = 0;
   int flagS = 0;
   int flagE = 0;
-  if (src) {
+  // if (src) {
     arr = (char *)calloc((strlen(src) + 1), sizeof(char));
     if (arr == NULL) {
       inerror = 1;
     }
-    for (size_t i = 0; i <= strlen(arr); i++) {
-      for (size_t j = 0; j <= strlen(trim_chars); j++) {
-        if (src[0] == trim_chars[j]) {
-          flagS++;
-        }    
-        if (src[strlen(src) - 1] == trim_chars[j]) {
-          flagE++;
-        } 
-      }      
-    }
-  }     
-  // size_t i = 0;
-  //       size_t j = strlen(src) - 1;
-        // if (flagS) i = 1;
-        // if (flagE) j -= 1;
-        // for (; i < j; i++) {
-        //     arr[i] = src[i];
-        //     // printf("%c", arr[i]);
-        // }
-        
- for (char *f = arr; *f; f++) {
-        if (flagS && f[0]) f++;
-        // if (flagE) j -= 1;
-}
-printf("\n%s", arr);
-
-  // for (size_t i = 0; i <= strlen(arr); i++) {
-  //   for(size_t j = 0; j <= strlen(trim_chars); j++) {
-  //     if (src[i] == trim_chars[j]) {
-  //       arr[i] = src[i+1];
-  //       i++;
-  //       flag++;
-  //       continue;
-  //   } else if (!flag) {
-  //       arr[i] = src[i];
-  //   }
-  //   }
-  // }
-
-free(arr);
-return inerror ? NULL : (void *)arr;
+      for (size_t i = 0; i <= strlen(arr); i++) {
+        for (size_t j = 0; j <= strlen(trim_chars); j++) {
+          if (src[i] == trim_chars[j]) {
+            flagS++;
+          } 
+          if (src[i] != trim_chars[j]) break;
+        }printf("%d %d\n", flagS, flagE);
+      }  
+      for (size_t i = strlen(arr); i > 0 ; i--) {
+        for (size_t j = 0; j <= strlen(trim_chars); j++) {
+          if (src[i] == trim_chars[j]) {
+            flagE++;
+          } 
+          if (src[i] != trim_chars[j]) continue;
+        }
+      }
+    
+        size_t i = 0;
+        size_t j = strlen(src) - 1;
+        if (flagS) i = flagS;
+        if (flagE) j -= flagE;
+        for (size_t l = 0; l < j; l++, i++) {
+          arr[l] += src[i];
+          // printf("%c", buf[i]);
+        }
+  free(arr);
+  return inerror ? NULL : (void *)arr;
 }
 
 int main() {
-  const char src[] = "\tdfghbknkl";
+  const char src[] = "\t\thello\t\t\ttimmy\t\t";
   //  const char str[] = "AAA";
-  const char *trim_chars = "\t\n\v\r\f\0";
+  const char *trim_chars = " \t\n\v\r\f\0";
   printf("%s", (char *)trim(src, trim_chars));
   // printf("%s", arr);
   return 0;
